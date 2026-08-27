@@ -290,7 +290,7 @@ Optional SSH port and TTY:
 
 ```json
 {
-  "host": "user@example.com",
+  "host": "my-server",
   "command": ["id"],
   "sudo": true,
   "port": 2222,
@@ -299,15 +299,27 @@ Optional SSH port and TTY:
 }
 ```
 
-- `host`: an OpenSSH destination or alias from `~/.ssh/config`.
+For non-default usernames, identity files, or other SSH options, configure an OpenSSH alias first:
+
+```sshconfig
+Host my-server
+    HostName example.com
+    User user
+    IdentityFile ~/.ssh/my-server
+    Port 2222
+```
+
+Then pass only the alias in `host`.
+
+- `host`: an OpenSSH destination or alias. Authentication must already work non-interactively using `~/.ssh/config`, a default SSH key, or an SSH agent. An alias is recommended when a specific user, non-default identity file, or other SSH options are required.
 - `command`: remote argv excluding `sudo`.
 - `sudo`: when true, runs the remote command as `sudo -S -p '' -- ...` when a remote sudo password is configured, otherwise as `sudo -n -- ...`.
 - `stdin`: optional data delivered to the remote command after the sudo password.
-- `port`: optional TCP port from 1 to 65535.
-- `tty`: uses `ssh -tt`; enable it only if the remote sudo policy requires a TTY.
+- `port`: optional TCP port from 1 to 65535. It controls the SSH connection port; it does not provide authentication credentials.
+- `tty`: uses `ssh -tt`; enable it only if the remote sudo policy requires a TTY. It does not make `ssh_execute` handle an interactive SSH login password prompt.
 - `timeout`: 60 seconds by default, capped at 600 seconds.
 
-SSH login authentication is handled by the local OpenSSH client. The server does not inject an SSH login password.
+SSH login authentication is handled entirely by the local OpenSSH client. `ssh_execute` does not inject an SSH login password and does not currently accept an explicit identity-file parameter equivalent to `ssh -i`. If a non-default private key is required, configure it with `IdentityFile` in `~/.ssh/config` or load it into an SSH agent.
 
 For compatibility, `shell_execute` also recognizes the common simple form:
 

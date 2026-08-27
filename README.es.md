@@ -290,7 +290,7 @@ Puerto SSH y TTY opcionales:
 
 ```json
 {
-  "host": "usuario@example.com",
+  "host": "mi-servidor",
   "command": ["id"],
   "sudo": true,
   "port": 2222,
@@ -299,15 +299,27 @@ Puerto SSH y TTY opcionales:
 }
 ```
 
-- `host`: destino o alias de OpenSSH definido, por ejemplo, en `~/.ssh/config`.
+Para usuarios no predeterminados, llaves privadas específicas u otras opciones SSH, configura primero un alias de OpenSSH:
+
+```sshconfig
+Host mi-servidor
+    HostName example.com
+    User usuario
+    IdentityFile ~/.ssh/mi-servidor
+    Port 2222
+```
+
+Después pasa únicamente el alias en `host`.
+
+- `host`: destino o alias de OpenSSH. La autenticación debe funcionar previamente de forma no interactiva mediante `~/.ssh/config`, una llave SSH predeterminada o un SSH agent. Se recomienda usar un alias cuando se necesite un usuario específico, una llave privada no predeterminada u otras opciones SSH.
 - `command`: argv remoto excluyendo `sudo`.
 - `sudo`: con `true`, ejecuta el comando remoto como `sudo -S -p '' -- ...` cuando existe contraseña sudo remota; de lo contrario usa `sudo -n -- ...`.
 - `stdin`: datos opcionales entregados al comando remoto después de la contraseña sudo.
-- `port`: puerto TCP opcional entre 1 y 65535.
-- `tty`: usa `ssh -tt`; actívalo únicamente si la policy sudo remota exige TTY.
+- `port`: puerto TCP opcional entre 1 y 65535. Controla el puerto de conexión SSH; no proporciona credenciales de autenticación.
+- `tty`: usa `ssh -tt`; actívalo únicamente si la policy sudo remota exige TTY. No hace que `ssh_execute` gestione un prompt interactivo de contraseña de login SSH.
 - `timeout`: 60 segundos por defecto, con máximo de 600 segundos.
 
-La autenticación de login SSH la maneja el cliente OpenSSH local. El servidor no inyecta una contraseña de inicio de sesión SSH.
+La autenticación de login SSH la maneja completamente el cliente OpenSSH local. `ssh_execute` no inyecta una contraseña de inicio de sesión SSH y actualmente no acepta un parámetro explícito de archivo de identidad equivalente a `ssh -i`. Si necesitas una llave privada no predeterminada, configúrala mediante `IdentityFile` en `~/.ssh/config` o cárgala en un SSH agent.
 
 Por compatibilidad, `shell_execute` también reconoce la forma simple común:
 
