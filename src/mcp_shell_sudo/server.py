@@ -113,7 +113,7 @@ async def ssh_execute(
     in the allowlist.
 
     Args:
-        host: SSH destination or alias, for example "julanito" or "user@192.168.1.10".
+        host: SSH destination or alias from `~/.ssh/config, for example "julanito" or "user@192.168.1.10".
         command: Remote executable and arguments, excluding sudo. For example ["id"] or
             ["systemctl", "restart", "docker"].
         sudo: Request sudo on the remote host.
