@@ -92,23 +92,53 @@ The allowlist applies to **executables**, not arguments. Allowing `bash`, `pytho
 
 ## Installation
 
+### Option 1 — Install directly from GitHub (recommended for users)
+
+If you only want to use the MCP and do not need a local source checkout, install it directly
+from the repository with `uv`:
+
 ```bash
+uv tool install git+https://github.com/eaangrino/mcp-shell-sudo.git
+```
+
+This installs `mcp-shell-sudo` in an isolated `uv` tool environment. You do **not** need to
+clone the repository manually.
+
+Verify that the executable is available:
+
+```bash
+command -v mcp-shell-sudo
+```
+
+If the `uv` tool bin directory is not yet in your `PATH`, run:
+
+```bash
+uv tool update-shell
+```
+
+The executable is typically available as `~/.local/bin/mcp-shell-sudo`.
+
+### Option 2 — Clone the repository (development or local changes)
+
+Clone the project when you want to inspect, modify, or contribute to the source code:
+
+```bash
+git clone https://github.com/eaangrino/mcp-shell-sudo.git
+cd mcp-shell-sudo
 uv sync
 ```
 
-For development:
+Install development dependencies with:
 
 ```bash
 uv sync --extra dev
 ```
 
-To install the MCP executable as an editable user tool:
+To expose the executable while keeping the local source editable:
 
 ```bash
 uv tool install --force --editable .
 ```
-
-The executable is typically installed as `~/.local/bin/mcp-shell-sudo`.
 
 ## Manual Execution
 

@@ -92,23 +92,53 @@ La allowlist es por **ejecutable**, no por argumentos. Permitir `bash`, `python`
 
 ## Instalación
 
+### Opción 1 — Instalar directamente desde GitHub (recomendado para usuarios)
+
+Si solo quieres usar el MCP y no necesitas tener una copia local del código fuente, instálalo
+directamente desde el repositorio con `uv`:
+
 ```bash
+uv tool install git+https://github.com/eaangrino/mcp-shell-sudo.git
+```
+
+Esto instala `mcp-shell-sudo` en un entorno aislado administrado por `uv`. No necesitas
+clonar manualmente el repositorio.
+
+Verifica que el ejecutable esté disponible:
+
+```bash
+command -v mcp-shell-sudo
+```
+
+Si el directorio de ejecutables de `uv` todavía no está en tu `PATH`, ejecuta:
+
+```bash
+uv tool update-shell
+```
+
+El ejecutable normalmente queda disponible como `~/.local/bin/mcp-shell-sudo`.
+
+### Opción 2 — Clonar el repositorio (desarrollo o cambios locales)
+
+Clona el proyecto cuando quieras revisar, modificar o contribuir al código fuente:
+
+```bash
+git clone https://github.com/eaangrino/mcp-shell-sudo.git
+cd mcp-shell-sudo
 uv sync
 ```
 
-Para desarrollo:
+Instala las dependencias de desarrollo con:
 
 ```bash
 uv sync --extra dev
 ```
 
-Para instalar el ejecutable MCP como tool editable del usuario:
+Para exponer el ejecutable manteniendo editable el código fuente local:
 
 ```bash
 uv tool install --force --editable .
 ```
-
-El ejecutable normalmente queda instalado como `~/.local/bin/mcp-shell-sudo`.
 
 ## Ejecutar manualmente
 
