@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence
 
 from .config import Settings
 
@@ -39,14 +39,12 @@ def validate_command(command: Sequence[str], settings: Settings) -> CommandReque
 
     executable = target_argv[0]
     executable_name = os.path.basename(executable)
-
-    if settings.allow_commands is not None:
-        if "/" in executable or "\\" in executable:
-            raise PolicyError(
-                "When ALLOW_COMMANDS is enabled, executables must be invoked by name, not by path"
-            )
-        if executable_name not in settings.allow_commands:
-            raise PolicyError(f"Command not allowed by ALLOW_COMMANDS: {executable_name}")
+    _validate_allowlisted_executable(executable, executable_name, settings)
+    if settings.allow_commands is not None and executable_name == "ssh":
+        raise PolicyError(
+            "Direct ssh through shell_execute is disabled while ALLOW_COMMANDS is enabled; "
+            "use ssh_execute so the remote target command is validated too"
+        )
 
     return CommandRequest(
         argv=argv,
@@ -54,6 +52,30 @@ def validate_command(command: Sequence[str], settings: Settings) -> CommandReque
         executable_name=executable_name,
         elevated=elevated,
     )
+
+
+def validate_remote_command(command: Sequence[str], settings: Settings) -> tuple[str, ...]:
+    """Validate an SSH remote command against the same command-name allowlist.
+
+    ssh_execute treats SSH as a transport. When ALLOW_COMMANDS is enabled both the local
+    ``ssh`` transport and the remote target executable must be explicitly allowlisted.
+    """
+    if not command:
+        raise PolicyError("remote command must contain at least one argv element")
+
+    argv = tuple(_validate_argv_element(value) for value in command)
+    if os.path.basename(argv[0]) == "sudo":
+        raise PolicyError("ssh_execute command must exclude sudo; set sudo=true instead")
+
+    executable = argv[0]
+    executable_name = os.path.basename(executable)
+
+    if settings.allow_commands is not None:
+        if "ssh" not in settings.allow_commands:
+            raise PolicyError("Command not allowed by ALLOW_COMMANDS: ssh")
+        _validate_allowlisted_executable(executable, executable_name, settings)
+
+    return argv
 
 
 def resolve_directory(requested: str | None, settings: Settings) -> Path:
@@ -89,6 +111,21 @@ def _validate_argv_element(value: str) -> str:
     if "\x00" in value:
         raise PolicyError("command elements cannot contain NUL bytes")
     return value
+
+
+def _validate_allowlisted_executable(
+    executable: str,
+    executable_name: str,
+    settings: Settings,
+) -> None:
+    if settings.allow_commands is None:
+        return
+    if "/" in executable or "\\" in executable:
+        raise PolicyError(
+            "When ALLOW_COMMANDS is enabled, executables must be invoked by name, not by path"
+        )
+    if executable_name not in settings.allow_commands:
+        raise PolicyError(f"Command not allowed by ALLOW_COMMANDS: {executable_name}")
 
 
 def _strip_plain_sudo(argv: tuple[str, ...]) -> tuple[str, ...]:
