@@ -2,6 +2,8 @@
 
 [English](README.md) | [Español](README.es.md)
 
+> **Warning:** Use this MCP with caution. If sudo credentials are configured, it can execute privileged commands both on the host machine and on SSH-connected remote systems.
+
 MCP server for Linux written in Python that executes local and remote SSH commands using explicit argv arrays, supports non-interactive local and remote `sudo`, provides an optional executable allowlist through `ALLOW_COMMANDS`, and can confine local filesystem writes to `WORK_DIR` using Bubblewrap.
 
 ## Requirements
