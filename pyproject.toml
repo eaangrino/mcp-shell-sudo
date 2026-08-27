@@ -1,7 +1,7 @@
 [project]
 name = "mcp-shell-sudo"
-version = "0.1.0"
-description = "MCP shell server for controlled argv execution with optional sudo password support and strict WORK_DIR filesystem confinement on Linux."
+version = "0.2.0"
+description = "MCP shell server for controlled local and SSH argv execution with sudo password support and strict local WORK_DIR filesystem confinement on Linux."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
